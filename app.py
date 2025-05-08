@@ -1,29 +1,26 @@
-import re
-from datetime import datetime
-
-from flask import Flask
-
-app = Flask(__name__)
+import requests, json
 
 
-@app.route("/")
-def home():
-    return "Hello, Flask!"
+api_key = "J79N6BMQG2YDZ7EUGA9QSNKH3"
+
+base_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
+
+# city = input("Enter city name (Limit to within the US): ")
+
+city = "Pleasanton"
+
+complete_url = base_url + city + "?unitGroup=us&key="+ api_key + "&contentType=json"
 
 
-@app.route("/hello/<name>")
-def hello_there(name):
-    now = datetime.now()
-    formatted_now = now.strftime("%A, %d %B, %Y at %X")
+response = requests.get(complete_url)
 
-    # Filter the name argument to letters only using regular expressions. URL arguments
-    # can contain arbitrary text, so we restrict to safe characters only.
-    match_object = re.match("[a-zA-Z]+", name)
+res_json = response.json()
 
-    if match_object:
-        clean_name = match_object.group(0)
-    else:
-        clean_name = "Friend"
 
-    content = "Hello there, " + clean_name + "! It's " + formatted_now
-    return content
+json_obj = json.dumps(res_json, indent=4)
+
+print(res_json["currentConditions"]["temp"])
+
+
+with open("temp.json", "w") as outfile:
+    outfile.write(json_obj)
